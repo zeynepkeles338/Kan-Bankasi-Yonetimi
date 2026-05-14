@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kan Bankası Projesi</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial;
+}
+
+body{
+    background:#eceff1;
+}
+
+/* HEADER */
+
+header{
+    background:linear-gradient(45deg,darkred,red);
+    color:white;
+    padding:25px;
+    text-align:center;
+    font-size:32px;
+    font-weight:bold;
+    box-shadow:0 3px 10px rgba(0,0,0,0.3);
+}
+
+/* CONTAINER */
+
+.container{
+    width:95%;
+    max-width:1200px;
+    margin:30px auto;
+}
+
+/* STATS */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.stat-box{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+
+.stat-box:hover{
+    transform:translateY(-5px);
+}
+
+.stat-box h2{
+    color:darkred;
+    font-size:40px;
+}
+
+.stat-box p{
+    margin-top:10px;
+    font-size:18px;
+}
+
+/* CARD */
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    margin-bottom:25px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card h2{
+    color:darkred;
+    margin-bottom:20px;
+}
+
+/* FORM */
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+}
+
+input,select{
+    padding:14px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:16px;
+}
+
+button{
+    padding:14px;
+    background:darkred;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    transition:0.3s;
+}
+
+button:hover{
+    background:red;
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+table th{
+    background:darkred;
+    color:white;
+}
+
+table th,table td{
+    padding:14px;
+    border:1px solid #ddd;
+    text-align:center;
+}
+
+tr:nth-child(even){
+    background:#f7f7f7;
+}
+
+/* SEARCH */
+
+.search{
+    margin-bottom:15px;
+}
+
+/* FOOTER */
+
+footer{
+    background:#111;
+    color:white;
+    text-align:center;
+    padding:20px;
+    margin-top:40px;
+}
+
+/* DELETE BUTTON */
+
+.delete-btn{
+    background:red;
+    padding:8px 12px;
+}
+
+.edit-btn{
+    background:orange;
+    padding:8px 12px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+🩸 Kan Bankası Yönetim Sistemi
+</header>
+
+<div class="container">
+
+<!-- STATS -->
+
+<div class="stats">
+
+<div class="stat-box">
+<h2 id="donorCount">0</h2>
+<p>Toplam Donör</p>
+</div>
+
+<div class="stat-box">
+<h2 id="bloodCount">0</h2>
+<p>Kan Ünitesi</p>
+</div>
+
+<div class="stat-box">
+<h2 id="bloodlist">0</h2>
+<p>Kan Grubların liste</p>
+</div>
+
+<div class="stat-box">
+<h2>8</h2>
+<p>Kan Grubu</p>
+</div>
+</div>
+
+<!-- FORM -->
+
+<div class="card">
+
+<h2>Yeni Donör Ekle</h2>
+
+<div class="form-grid">
+
+<input type="text" id="ad" placeholder="Ad Soyad">
+
+<input type="number" id="yas" placeholder="Yaş">
+
+<select id="kan">
+<option>A+</option>
+<option>A-</option>
+<option>B+</option>
+<option>B-</option>
+<option>AB+</option>
+<option>AB-</option>
+<option>0+</option>
+<option>0-</option>
+</select>
+
+<input type="text" id="telefon" placeholder="Telefon">
+
+<button onclick="ekleDonor()">Donör Ekle</button>
+
+</div>
+
+</div>
+
+<!-- TABLE -->
+
+<div class="card">
+
+<h2>Donör Listesi</h2>
+
+<input type="text" id="arama" class="search" placeholder="Donör Ara..." onkeyup="ara()">
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Ad Soyad</th>
+<th>Yaş</th>
+<th>Kan</th>
+<th>Telefon</th>
+<th>İşlem</th>
+</tr>
+</thead>
+
+<tbody id="liste"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<footer>
+© 2026 Kan Bankası Sistemi | HTML CSS İbrahim Hoca üsküdar
+</footer>
+
+<script>
+
+let donors = [];
+let id = 0;
+
+/* EKLE */
+
+function ekleDonor(){
+
+    let ad = document.getElementById("ad").value;
+    let yas = document.getElementById("yas").value;
+    let kan = document.getElementById("kan").value;
+    let telefon = document.getElementById("telefon").value;
+
+    if(ad=="" || yas=="" || telefon==""){
+        alert("Lütfen tüm alanları doldurun");
+        return;
+    }
+
+    id++;
+
+    let donor = {
+        id:id,
+        ad:ad,
+        yas:yas,
+        kan:kan,
+        telefon:telefon
+    };
+
+    donors.push(donor);
+
+    tabloGoster();
+
+    temizle();
+}
+
+/* TABLO */
+
+function tabloGoster(){
+
+    let tablo = "";
+
+    donors.forEach((d,index)=>{
+
+        tablo += `
+        <tr>
+            <td>${d.id}</td>
+            <td>${d.ad}</td>
+            <td>${d.yas}</td>
+            <td>${d.kan}</td>
+            <td>${d.telefon}</td>
+
+            <td>
+                <button class="edit-btn" onclick="duzenle(${index})">Düzenle</button>
+
+                <button class="delete-btn" onclick="sil(${index})">Sil</button>
+            </td>
+        </tr>
+        `;
+    });
+
+    document.getElementById("liste").innerHTML = tablo;
+
+    document.getElementById("donorCount").innerText = donors.length;
+	
+	document.getElementById("bloodCount").innerText = donors.length;
+
+  let grupSayilari = {};
+
+donors.forEach(d => {
+
+    if(grupSayilari[d.kan]){
+        grupSayilari[d.kan]++;
+    }else{
+        grupSayilari[d.kan] = 1;
+    }
+
+});
+
+let sonuc = "";
+
+for(let grup in grupSayilari){
+    sonuc += grup + ": " + grupSayilari[grup] + " ";
+}
+
+document.getElementById("bloodlist").innerText = sonuc;
+}
+
+/* TEMİZLE */
+
+function temizle(){
+    document.getElementById("ad").value="";
+    document.getElementById("yas").value="";
+    document.getElementById("telefon").value="";
+}
+
+/* SİL */
+
+function sil(index){
+
+    if(confirm("Donör silinsin mi?")){
+
+        donors.splice(index,1);
+
+        tabloGoster();
+    }
+}
+
+/* DÜZENLE */
+
+function duzenle(index){
+
+    let yeniAd = prompt("Yeni ad:", donors[index].ad);
+
+    if(yeniAd != null){
+
+        donors[index].ad = yeniAd;
+
+        tabloGoster();
+    }
+}
+
+/* ARA */
+
+function ara(){
+
+    let input = document.getElementById("arama").value.toLowerCase();
+
+    let rows = document.querySelectorAll("#liste tr");
+
+    rows.forEach(row=>{
+
+        let text = row.innerText.toLowerCase();
+
+        if(text.includes(input)){
+            row.style.display="";
+        }else{
+            row.style.display="none";
+        }
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
